@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score,roc_auc_score,f1_score,classification_report,confusion_matrix
 
@@ -33,10 +34,32 @@ class ModelTrainer:
 
             models = {
                 "Random Forest": RandomForestClassifier(),
-                "Logistic Regression": LogisticRegression()
+                 "XGBClassifier": XGBClassifier(),
+                 "KNeighborsClassifier": KNeighborsClassifier(),
             }
 
-            model_report:dict=evaluate_models(X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,models=models)
+            params={
+               
+                 "Random Forest":{
+                     'n_estimators': [20,40,60,100],
+                     'max_depth': [5,10, 15, 20]
+                 },
+                  "XGBClassifier":{
+                     'n_estimators': [100, 200, 300],
+                     'learning_rate': [0.01, 0.1, 0.2],
+                     'max_depth': [3, 6, 10],
+                     'subsample': [0.8, 0.9, 1.0]
+                 }, 
+                  "KNeighborsClassifier":{
+                      'n_neighbors': [3, 5, 7, 10],
+                      'weights': ['uniform', 'distance'],
+                      'p': [1, 2]
+                  }
+                
+            }
+
+            model_report:dict=evaluate_models(X_train=X_train,y_train=y_train,X_test=X_test,y_test=y_test,
+                                             models=models,param=params) 
 
             best_model_score = max(sorted(model_report.values()))
 
